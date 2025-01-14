@@ -7,7 +7,7 @@ services:
       MYSQL_ROOT_PASSWORD: "root"
     volumes:
       - ./config/init.sql:/docker-entrypoint-initdb.d/db_init.sql
-      - indexer_data:/var/lib/mysql
+      - /data/flare/indexer_data:/var/lib/mysql
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "--silent", "--host", "localhost", "-proot"]
       timeout: 20s
@@ -22,6 +22,8 @@ services:
     depends_on:
       c-chain-indexer-db:
         condition: service_healthy
+    extra_hosts:
+      - host.docker.internal:host-gateway
 
   system-client:
     restart: unless-stopped
@@ -29,6 +31,8 @@ services:
     image: ghcr.io/flare-foundation/flare-system-client:v1.0.1
     volumes:
       - ./mounts/system-client/config.toml:/app/config.toml
+    ports:
+      - "9090:9090"
     environment:
       SYSTEM_CLIENT_SENDER_PRIVATE_KEY: ${SIGNING_PK}
       SIGNING_POLICY_PRIVATE_KEY: ${SIGNING_PK}
@@ -40,6 +44,8 @@ services:
     stop_grace_period: 135s 
     depends_on:
       - c-chain-indexer
+    extra_hosts:
+      - host.docker.internal:host-gateway
 
   ftso-client:
     restart: unless-stopped
@@ -76,6 +82,17 @@ services:
       SORTITION_PRIVATE_KEY: ${FAST_UPDATES_SORTITION_PRIVATE_KEY}
     depends_on:
       - c-chain-indexer
+    extra_hosts:
+      - host.docker.internal:host-gateway
 
-volumes:
-  indexer_data:
+  value-provider:
+    profiles: [scaling]
+    container_name: ${COMPOSE_PROJECT_NAME}-value-provider
+    image: ghcr.io/flare-foundation/ftso-v2-example-value-provider:latest
+    #image: a41ventures/ftso-v2-example-value-provider:latest
+    ports:
+      - "3101:3101"
+    environment:
+      FEED_CALIBRATION_ENABLED: true
+      IDENTITY_ADDRESS: ${IDENTITY}
+

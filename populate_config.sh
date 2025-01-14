@@ -175,7 +175,7 @@ main() {
         -H "Content-Type: application/json" \
         --data '{"method":"eth_blockNumber","params":[],"id":1,"jsonrpc":"2.0"}' \
         | jq -r '.result')
-    export INDEXER_START_BLOCK=$((16#${block_hex/0x/} - 1000000))
+    export INDEXER_START_BLOCK=$((16#${block_hex/0x/} - 10000))
 
     # write configs
 
