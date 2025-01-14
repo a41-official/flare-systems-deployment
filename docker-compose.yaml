@@ -8,6 +8,8 @@ services:
     volumes:
       - ./config/init.sql:/docker-entrypoint-initdb.d/db_init.sql
       - /data/flare/indexer_data:/var/lib/mysql
+    ports:
+      - "3306:3306"
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "--silent", "--host", "localhost", "-proot"]
       timeout: 20s
@@ -86,13 +88,9 @@ services:
       - host.docker.internal:host-gateway
 
   value-provider:
-    profiles: [scaling]
+    profiles: [fsp, fast-updates, ftso]
     container_name: ${COMPOSE_PROJECT_NAME}-value-provider
     image: ghcr.io/flare-foundation/ftso-v2-example-value-provider:latest
-    #image: a41ventures/ftso-v2-example-value-provider:latest
     ports:
       - "3101:3101"
-    environment:
-      FEED_CALIBRATION_ENABLED: true
-      IDENTITY_ADDRESS: ${IDENTITY}
 
