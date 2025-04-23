@@ -30,7 +30,7 @@ services:
   system-client:
     restart: unless-stopped
     profiles: [fsp, system-client]
-    image: ghcr.io/flare-foundation/flare-system-client:v1.0.2
+    image: ghcr.io/flare-foundation/flare-system-client:v1.0.3
     volumes:
       - ./mounts/system-client/config.toml:/app/config.toml
     ports:
@@ -64,7 +64,7 @@ services:
   fdc-client:
     restart: unless-stopped
     profiles: [fsp, fdc]
-    image: ghcr.io/flare-foundation/fdc-client:v1.0.3
+    image: ghcr.io/flare-foundation/fdc-client:v1.0.4
     volumes:
       - ./mounts/fdc-client/config.toml:/app/configs/userConfig.toml
     depends_on:
@@ -82,6 +82,7 @@ services:
       SIGNING_PRIVATE_KEY: ${SIGNING_PK}
       ACCOUNTS: ${FAST_UPDATES_ACCOUNTS}
       SORTITION_PRIVATE_KEY: ${FAST_UPDATES_SORTITION_PRIVATE_KEY}
+      API_KEY: ${NODE_API_KEY}
     depends_on:
       - c-chain-indexer
     extra_hosts:
